@@ -1,0 +1,26 @@
+{
+  "name": "cse340-course-repo",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mma200631/CSE340-course-Repo.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mma200631/CSE340-course-Repo/issues"
+  },
+  "homepage": "https://github.com/mma200631/CSE340-course-Repo#readme",
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "nodemon": "^3.1.14"
+  }
+}
