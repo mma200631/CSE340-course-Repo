@@ -4,6 +4,7 @@ import express from 'express';
 import { testConnection } from './src/models/db.js';
 import { getAllOrganizations } from './src/models/organization.js';
 import { getAllProjects } from './src/models/project.js';
+import { getAllCategories } from './src/models/categories.js';
 
 const NODE_ENV = process.env.NODE_ENV?.toLowerCase() ||'production';
 const PORT = process.env.PORT ||3000;
@@ -35,9 +36,10 @@ app.get('/project',async (req, res) =>{
     const title = 'Service Projects';
     res.render('project', { title,projects });
 });
-app.get('/categories', (req, res) => {
-  const title = 'Project Categories';
-  res.render('categories', { title });
+app.get('/categories', async (req, res) => {
+  const categories = await getAllCategories();
+  const title = 'Service Project Categories';
+  res.render('categories', { title, categories });
 });
 
 app.listen(PORT, async () => {
