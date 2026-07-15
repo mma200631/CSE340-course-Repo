@@ -1,10 +1,10 @@
-<% - include('partials/header') %>
+<%- include('../partials/header') %>
         <main>
             <h1>Something went wrong</h1>
             <p>We're experincing technical dificulties. Our team has been notified and is working to fix the issue.</p>
             <p>Please try again later or return to the <a href="/">Homepage</a>to continue browsing.</p>
 
-            <% if (NODE-ENV ==='development') { %>
+            <% if (NODE_ENV ==='development') { %>
             <details open>
                 <summary>Error Details(Development Mode) </summary>
                 <pre><%= error %> </pre>
@@ -12,4 +12,4 @@
             </details>
             <% } %>
         </main>
-        <%- include('partials/footer') %>
+        <%- include('../partials/footer') %>
