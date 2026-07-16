@@ -61,7 +61,7 @@ app.use((err, req, res, next) => {
    };
 
    //Render the appoprite error template
-   res.status(status).render(`error/${template}`, context);
+   res.status(status).render(`errors/${template}`, context);
 });
 
 app.listen(PORT, async () => {
