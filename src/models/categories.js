@@ -10,4 +10,29 @@ const getAllCategories = async () => {
     return result.rows;
 };
 
-export { getAllCategories };
+// Function to get categories by ID
+const getCategoriesById = async (categoryId) => {
+    const query = `
+        SELECT category_id, category_name
+        FROM public.category
+        WHERE category_id=$1
+    `;
+
+    const result = await db.query(query, [categoryId]);
+    return result.rows;
+};
+
+//Get all categories for a service project
+const getCategoriesByProjectId = async (projectId) => {
+    const query = `
+        SELECT c.category_id, c.category_name
+        FROM public.category c
+        JOIN public.project_category pc 
+        ON c.category_id = pc.category_id
+        WHERE pc.project_id = $1;
+    `;
+    const result = await db.query(query, [projectId]);
+    return result.rows;
+};
+
+export { getAllCategories, getCategoriesById, getCategoriesByProjectId };
