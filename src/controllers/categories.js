@@ -1,8 +1,18 @@
 // Import  needed model functions
-import { getAllCategories, getCategoriesById,getCategoriesByProjectId , updateCategoryAssignments} from '../models/categories.js';
+import { getAllCategories, getCategoriesById,getCategoriesByProjectId , updateCategoryAssignments, createCategory, updateCategory} from '../models/categories.js';
 import { getProjectsByCategoryId, getProjectDetails } from '../models/project.js';
-
+import {  body,validationResult } from 'express-validator';
 // Define  controller functions
+
+const categoryValidation = [
+    body("category_name")
+        .trim()
+        .notEmpty()
+        .withMessage("Category name is required.")
+        .isLength({ min: 3, max: 100 })
+        .withMessage("Category name must be between 3 and 100 characters.")
+];
+
 const showCategoriesPage = async (req, res) => {
   const categories = await getAllCategories();
   const title = 'Service Project Categories';
@@ -41,7 +51,64 @@ const processAssignCategoriesForm = async(req, res)=>{
 
 }
 
+const showNewCategoryForm = async(req, res)=> {
+  const title= 'Create New Category';
+  res.render('new-category', {title});
 
+};
+
+const processNewCategoryForm = async(req, res)=> {
+  const results= validationResult(req);
+  if (!results.isEmpty()) {
+        results.array().forEach((error) => {
+            req.flash("error", error.msg);
+        });
+
+        return res.redirect("/new-category"); 
+    }
+
+    const { category_name } = req.body;
+
+    await createCategory(category_name);
+
+    req.flash("success", "Category created successfully!");
+
+    res.redirect("/categories");
+}
+
+const showEditCategoryForm = async(req, res)=> {
+  const categoryId = req.params.id;
+
+    const category = await getCategoriesById(categoryId);
+
+    const title = "Edit Category";
+
+    res.render("edit-category", {
+        title,
+        category
+    });
+};
+
+const processEditCategoryForm = async(req, res)=> {
+  const results = validationResult(req);
+
+    if (!results.isEmpty()) {
+        results.array().forEach((error) => {
+            req.flash("error", error.msg);
+        });
+
+        return res.redirect("/edit-category/" + req.params.id);
+    }
+
+    const categoryId = req.params.id;
+    const { category_name } = req.body;
+
+    await updateCategory(categoryId, category_name);
+
+    req.flash("success", "Category updated successfully!");
+
+    res.redirect(`/category/${categoryId}`);
+}
 
 //Export controller functions
-export { showCategoriesPage, showCategoriesByIdPage, showAssignCategoriesForm, processAssignCategoriesForm };
+export { showCategoriesPage, showCategoriesByIdPage, showAssignCategoriesForm, processAssignCategoriesForm, showNewCategoryForm, processNewCategoryForm, showEditCategoryForm, processEditCategoryForm, categoryValidation };
