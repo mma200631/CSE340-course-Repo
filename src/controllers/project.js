@@ -1,8 +1,47 @@
 // Import  needed model functions
-import { getUpcomingProjects,getProjectDetails} from '../models/project.js';
+import { getUpcomingProjects,getProjectDetails, createProject, updateProject} from '../models/project.js';
 import { getCategoriesByProjectId } from '../models/categories.js';
+import { getAllOrganizations } from '../models/organization.js';
+import { validationResult, body } from 'express-validator';
+
+const projectValidation= [
+    body('title')
+    .trim()
+    .notEmpty()
+    .withMessage('Title is required')
+    .isLength({min:3, max:200})
+    .withMessage('Title must be within 3 and 200 characters'),
+
+    body('description')
+    .trim()
+    .notEmpty()
+    .withMessage('Description is required')
+    .isLength({max:1000})
+    .withMessage('Description must be less than 1000 characters'),
+
+    body('location')
+    .trim()
+    .notEmpty()
+    .withMessage('Location is required')
+    .isLength({max:200})
+    .withMessage('Location must be less than 200 characters'),
+
+    body('date')
+    .notEmpty()
+    .withMessage('Date is required')
+    .isISO8601()
+    .withMessage('Date must be a valid datte format'),
+
+    body('organizationId')
+    .notEmpty()
+    .withMessage('Organization is required')
+    .isInt()
+    .withMessage('Organization must be a valid integer')
+]
 
 const NUMBER_OF_UPCOMING_PROJECTS = 5; // Number of upcoming projects to display
+
+
 
 // Define  controller functions
 const showProjectPage = async (req, res) => {
@@ -19,6 +58,70 @@ const showProjectDetailsPage = async (req, res) => {
     res.render('project-details', { title, projectDetails, categories });
 }
 
+const showNewProjectForm = async(req, res)=>{
+    const organization= await getAllOrganizations();
+    const title= 'Add new service project';
+    res.render('new-project', {title, organization});
+}
+
+const processNewProjectForm= async(req, res)=>{
+    const result= validationResult(req);
+    if (!result.isEmpty()) {
+        // Validation failed - loop through errors
+        result.array().forEach((error) => {
+            req.flash('error', error.msg);
+        });
+        // Redirect back to the edit organization form
+        return res.redirect('/new-project');
+    }
+
+
+    const{title ,description,location,project_date,organizationId}= req.body;
+
+    try{
+        const newProjectId= await createProject(title, description, location, project_date, organizationId);
+
+        req.flash('success', 'New service project created successfully!');
+        res.redirect('/project');
+    }
+    catch(error)
+    {
+        console.error('Error creating new project:', error);
+        req.flash('error', 'There was an error creating the service project.');
+        res.redirect('/new-project');
+    }
+}
+
+const showEditProjectForm = async(req, res)=>{
+     const projectId = req.params.id;
+     const projectDetails= await getProjectDetails(projectId);
+     const organizations= await getAllOrganizations()
+     const title= 'Edit Projects';
+     res.render('edit-project', {title, projectDetails, organizations});
+}
+
+const processEditProjectForm = async(req, res)=>{
+
+    // Check for validation errors
+    const results = validationResult(req);
+    if (!results.isEmpty()) {
+        // Validation failed - loop through errors
+        results.array().forEach((error) => {
+            req.flash('error', error.msg);
+        });
+        // Redirect back to the edit organization form
+        return res.redirect('/edit-project/' + req.params.id);
+    }
+
+    const projectId = req.params.id;
+    const{title, description, location, project_date, organizationId }= req.body
+    await updateProject( projectId, title, description, location, project_date, organizationId)
+
+    req.flash('success', ' Project updated successfully!');
+  res.redirect(`/project/${projectId}`);
+
+
+}
 
 //Export controller functions
-export { showProjectPage, showProjectDetailsPage};
+export { showProjectPage, showProjectDetailsPage, showNewProjectForm, processNewProjectForm,projectValidation, showEditProjectForm, processEditProjectForm};
