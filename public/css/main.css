@@ -262,6 +262,26 @@ button:active {
     border-color: #bee5eb;
 }
 
+.dashboard-link {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+.dashboard-link a {
+    display: inline-block;
+    padding: 12px 24px;
+    background-color:#2E7D32;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
+
+.dashboard-link a:hover {
+    background-color: #1B5E20;
+}
+
 /* Responsive */
 
 @media(max-width:768px){
