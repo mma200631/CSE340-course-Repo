@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import {createUser, authenticateUsers,getNewUser} from '../models/users.js';
+import { getVolunteerProject } from '../models/volunteer.js';
 
 const showUserRegistrationForm = async(req, res) => {
     const title = 'Register';
@@ -41,6 +42,8 @@ const processLoginForm = async(req, res)=> {
     // If authentication is successful
     if(user) {
         req.session.user= user; // store user info in session
+        console.log("After login, session user:");
+        console.log(req.session.user);
         req.flash('Success', 'Login successful!');
         if (res.locals.NODE_ENV === 'development') {
                 console.log('User logged in:', user);
@@ -68,17 +71,21 @@ const logOutUser= async(req, res)=>{
 const requireLogin= async(req, res, next)=>{
     if(!req.session.user){
         req.flash('error', 'Please log in to access this page.');
-        res.redirect('/login');
+         return res.redirect('/login');
     }
     next();
 }
 
 const showDashboard = async(req, res)=>{
     const user = req.session.user;
+    const volunteerProject= await getVolunteerProject(
+        user.user_id
+    );
     const title= 'Dashboard';
     res.render('dashboard', {
         title,
-        user
+        user,
+        volunteerProject
     });
 }
 

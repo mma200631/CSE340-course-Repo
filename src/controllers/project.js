@@ -3,6 +3,7 @@ import { getUpcomingProjects,getProjectDetails, createProject, updateProject} fr
 import { getCategoriesByProjectId } from '../models/categories.js';
 import { getAllOrganizations } from '../models/organization.js';
 import { validationResult, body } from 'express-validator';
+import { isVolunteered } from '../models/volunteer.js';
 
 const projectValidation= [
     body('title')
@@ -55,7 +56,24 @@ const showProjectDetailsPage = async (req, res) => {
     const projectDetails = await getProjectDetails(projectId);
     const categories = await getCategoriesByProjectId(projectId);
     const title = 'Project Details';
-    res.render('project-details', { title, projectDetails, categories });
+    let isVolunteer = false;
+
+    if (req.session.user) {
+
+        isVolunteer = await isVolunteered(
+            req.session.user.user_id,
+            projectId
+        );
+
+    }
+
+    res.render('project-details', {
+        title,
+        projectDetails,
+        categories,
+        user: req.session.user,
+        isVolunteer: isVolunteer
+    });
 }
 
 const showNewProjectForm = async(req, res)=>{
@@ -122,6 +140,8 @@ const processEditProjectForm = async(req, res)=>{
 
 
 }
+
+
 
 //Export controller functions
 export { showProjectPage, showProjectDetailsPage, showNewProjectForm, processNewProjectForm,projectValidation, showEditProjectForm, processEditProjectForm};

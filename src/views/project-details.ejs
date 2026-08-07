@@ -41,6 +41,26 @@
             </a>
         </p>
     <% } %>
+
+    <% if(user){ %>
+
+    <% if(isVolunteer){ %>
+
+        <p>You are volunteering for this project.</p>
+
+        <form action="/project/<%= projectDetails.project_id %>/remove-volunteer" method="POST">
+            <button>Remove Volunteer</button>
+        </form>
+
+    <% }else{ %>
+
+        <form action="/project/<%= projectDetails.project_id %>/volunteer" method="POST">
+            <button>Volunteer</button>
+        </form>
+
+    <% } %>
+
+<% } %>
 </p>
 </main>
 
